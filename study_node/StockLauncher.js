@@ -32,7 +32,7 @@ r.on('line', function(line){
             startTime:today,
             endTime:today,
             timeframe:"day",
-            symbol:"005930"
+            symbol:line //ex: 005930
         }
     };
     request(options,function(err,response,body){
