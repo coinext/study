@@ -15,34 +15,38 @@ public class StockLauncher {
 
     final static String STOCK_BASE_URL = "https://api.finance.naver.com/siseJson.naver?requestType=1&startTime=%s&endTime=%s&timeframe=day&symbol=%s";
 
-    public static String getInfos(String stockCode) throws IOException {
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        Date date = new Date();
-        String today = dateFormat.format(date);
+    public static String getInfos(String stockCode) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            Date date = new Date();
+            String today = dateFormat.format(date);
 
-        String stockUrl = String.format(STOCK_BASE_URL, today, today, stockCode);
-        System.out.println(stockUrl);
+            String stockUrl = String.format(STOCK_BASE_URL, today, today, stockCode);
+            System.out.println(stockUrl);
 
-        URL uri = new URL(stockUrl);
-        HttpURLConnection connection = (HttpURLConnection) uri.openConnection();
-        connection.setRequestProperty("ContentType", "application/json");
+            URL uri = new URL(stockUrl);
+            HttpURLConnection connection = (HttpURLConnection) uri.openConnection();
+            connection.setRequestProperty("ContentType", "application/json");
 
-        try (BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String line;
-            StringBuffer buffer = new StringBuffer();
-            while ((line = input.readLine()) != null) {
-                buffer.append(line);
+            try (BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String line;
+                StringBuffer buffer = new StringBuffer();
+                while ((line = input.readLine()) != null) {
+                    buffer.append(line);
+                }
+
+                connection.disconnect();
+                String resStockInfo = buffer.toString()
+                        .split("],")[1]
+                        .split("]")[0]
+                        .replaceAll("\\[", "")
+                        .trim();
+                System.out.println(resStockInfo);
+
+                return resStockInfo;
             }
-
-            connection.disconnect();
-            String resStockInfo = buffer.toString()
-                    .split("],")[1]
-                    .split("]")[0]
-                    .replaceAll("\\[", "")
-                    .trim();
-            System.out.println(resStockInfo);
-
-            return resStockInfo;
+        } catch (Exception ex) {
+            return "";
         }
     }
 
