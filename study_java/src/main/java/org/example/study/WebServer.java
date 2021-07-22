@@ -4,6 +4,7 @@ import com.google.common.io.Resources;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,11 +14,11 @@ import java.util.concurrent.Executors;
 
 public class WebServer {
 
-    static String html;
+    static String rootHtml;
 
     static {
         try {
-            html = Resources.toString(
+            rootHtml = Resources.toString(
                     Resources.getResource("views/stocks.html")
                     , StandardCharsets.UTF_8);
         } catch (Exception e) {
@@ -25,21 +26,35 @@ public class WebServer {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("ready.." );
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 100);
-        server.createContext("/stocks", new StockWebHandler());
+        server.createContext("/", new RootWebHandler());
+        server.createContext("/stocks", new StockInfoWebHandler());
         server.setExecutor(Executors.newFixedThreadPool(100));
         server.start();
-        System.out.println("start..");
+        System.out.println("web server start..");
     }
 
-    static class StockWebHandler implements HttpHandler {
+    static class RootWebHandler implements HttpHandler {
 
         @Override
         public void handle(HttpExchange t) throws IOException {
-            t.sendResponseHeaders(200, html.length());
+            t.sendResponseHeaders(200, rootHtml.length());
             OutputStream os = t.getResponseBody();
-            os.write(html.getBytes());
+            os.write(rootHtml.getBytes());
+            os.close();
+        }
+    }
+
+    static class StockInfoWebHandler implements HttpHandler {
+
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            String code = URLEncodedUtils.parse(t.getRequestURI().getQuery()
+                    , StandardCharsets.UTF_8).get(0).getValue();
+            String data = StockLauncher.getInfos(code); //ex: "005930"
+            t.sendResponseHeaders(200, data.length());
+            OutputStream os = t.getResponseBody();
+            os.write(data.getBytes());
             os.close();
         }
     }
