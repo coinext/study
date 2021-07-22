@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class WebServer {
 
     static String html;
-    static List<String> stockCodes = Arrays.asList("005930", "005930");
+    static List<String> stockCodes = Arrays.asList("005930", "293490", "181710", "036570", "3659");
     static {
         try {
             html = Resources.toString(
