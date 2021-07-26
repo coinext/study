@@ -22,7 +22,7 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
       threads = [str]
       for i in range(len(STOCK_CODES)):
         print(STOCK_CODES[i])
-        th = threading.Thread(target = stock_launch2, args=('005930',))
+        th = threading.Thread(target = stock_launch2, args=[STOCK_CODES[i]])
         threads.append(th)
         th.start()
 
