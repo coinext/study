@@ -53,7 +53,6 @@ async function getAsyncStockInfo(stockCode) {
         }
     };
 
-    console.log("xxx");
     return await asyncRequest(options);
 }
 
@@ -68,8 +67,8 @@ const app = http.createServer(async function(request,response){
         for (let index in stockCodes) {
             awaits.push(getAsyncStockInfo(stockCodes[index]));
         }
-       // let stocks = await Promise.all(awaits);
-       // data = stocks.join("<br/>");
+        let stocks = await Promise.all(awaits);
+        data = stocks.join("<br/>");
     }
 
     response.writeHead(200);
